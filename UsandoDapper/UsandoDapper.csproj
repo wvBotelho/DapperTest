@@ -54,9 +54,13 @@
   <ItemGroup>
     <Compile Include="Data\DapperRepository.cs" />
     <Compile Include="Data\EntityContext.cs" />
-    <Compile Include="Migrations\201712021846117_InitialCreate.cs" />
-    <Compile Include="Migrations\201712021846117_InitialCreate.Designer.cs">
-      <DependentUpon>201712021846117_InitialCreate.cs</DependentUpon>
+    <Compile Include="Migrations\201712022012405_InitialCreate.cs" />
+    <Compile Include="Migrations\201712022012405_InitialCreate.Designer.cs">
+      <DependentUpon>201712022012405_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712022023435_FornecedorOpcional.cs" />
+    <Compile Include="Migrations\201712022023435_FornecedorOpcional.Designer.cs">
+      <DependentUpon>201712022023435_FornecedorOpcional.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Fornecedor.cs" />
@@ -70,8 +74,11 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201712021846117_InitialCreate.resx">
-      <DependentUpon>201712021846117_InitialCreate.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201712022012405_InitialCreate.resx">
+      <DependentUpon>201712022012405_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712022023435_FornecedorOpcional.resx">
+      <DependentUpon>201712022023435_FornecedorOpcional.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

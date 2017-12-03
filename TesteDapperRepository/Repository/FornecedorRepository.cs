@@ -9,21 +9,21 @@ using UsandoDapper.Models;
 
 namespace TesteDapperRepository.Repository
 {
-    public class ProdutoRepository : GenericRepository<Produto>, IProdutoReposity
+    public class FornecedorRepository : GenericRepository<Fornecedor>, IFornecedorRepository
     {
         private IConnectionFactory connectionFactory;
 
-        public ProdutoRepository()
+        public FornecedorRepository()
         {
             //conexão
             connectionFactory = new ConnectionFactory();
 
             //mapeando atributos do objeto com a tabela  
-            SqlMapper.SetTypeMap(typeof(Produto), new CustomPropertyTypeMap(typeof(Produto),
+            SqlMapper.SetTypeMap(typeof(Fornecedor), new CustomPropertyTypeMap(typeof(Fornecedor),
                 (type, columnName) => type.GetProperties().FirstOrDefault(prop => prop.GetCustomAttributes(false).OfType<ColumnAttribute>().Any(attr => attr.Name == columnName))));
         }
 
-        public override bool Add(Produto entity)
+        public override bool Add(Fornecedor entity)
         {
             try
             {
@@ -34,13 +34,13 @@ namespace TesteDapperRepository.Repository
 
                 using (var connection = new SqlConnection(connectionFactory.GetConnection.ConnectionString.ToString()))
                 {
-                    string commandInsert = "insert into dbo.wbyp_produto_dap (nome, preco, qtd_estoque, qtd_pedido, data_registro, data_esgotado) " +
-                                           "values (@Nome, @Preco, @QtEstoque, @QtPedido, @DataRegistro, @DataEsgotado)";
+                    string commandInsert = "insert into dbo.wbyp_fornecedor_dap (nome, nome_contato, cargo, cidade, pais) " +
+                                           "values (@Nome, @NomeContato, @Cargo, @Cidade, @Pais)";
 
                     connection.Execute(commandInsert, entity, null, 5000);
 
                     return true;
-                }               
+                }
             }
             catch (SqlException e)
             {
@@ -48,7 +48,7 @@ namespace TesteDapperRepository.Repository
             }
         }
 
-        public override bool Update(Produto entity)
+        public override bool Update(Fornecedor entity)
         {
             try
             {
@@ -59,14 +59,14 @@ namespace TesteDapperRepository.Repository
 
                 using (var connection = new SqlConnection(connectionFactory.GetConnection.ConnectionString.ToString()))
                 {
-                    string commandUpdate = "update dbo.wbyp_produto_dap " +
-                                           "set nome = @Nome, preco = @Preco, qtd_estoque = @QtEstoque, qtd_pedido = @QtPedido, data_registro = @DataRegistro, data_esgotado = @DataEsgotado " +
-                                           "where id_produto = @ProdutoID";
+                    string commandUpdate = "update dbo.wbyp_fornecedor_dap " +
+                                           "set nome = @Nome, nome_contato = @NomeContato, cargo = @Cargo"; 
 
                     connection.Execute(commandUpdate, entity);
 
                     return true;
                 }
+
             }
             catch (SqlException e)
             {
@@ -85,10 +85,10 @@ namespace TesteDapperRepository.Repository
 
                 using (var connection = new SqlConnection(connectionFactory.GetConnection.ConnectionString.ToString()))
                 {
-                    string commandDelete = "delete from dbo.wbyp_produto_dap " +
-                                           "where id_produto = @ProdutoID";
+                    string commandDelete = "delete from dbo.wbyp_fornecedor_dap " +
+                                           "where id_fornecedor = @FornecedorID";
 
-                    connection.Execute(commandDelete, new { ProdutoID = id });
+                    connection.Execute(commandDelete, new { FornecedorID = id });
 
                     return true;
                 }
@@ -99,7 +99,7 @@ namespace TesteDapperRepository.Repository
             }
         }
 
-        public override Produto Find(int id)
+        public override Fornecedor Find(int id)
         {
             try
             {
@@ -110,10 +110,10 @@ namespace TesteDapperRepository.Repository
 
                 using (var connection = new SqlConnection(connectionFactory.GetConnection.ConnectionString.ToString()))
                 {
-                    string commandSelect = "select * from dbo.wbyp_produto_dap " +
-                                           "where id_produto = @ProdutoID";
+                    string commandSelect = "select * from dbo.wbyp_fornecedor_dap " +
+                                           "where id_fornecedor = @FornecedorID";
 
-                    return connection.QueryFirstOrDefault<Produto>(commandSelect, new { ProdutoID = id });
+                    return connection.QueryFirstOrDefault<Fornecedor>(commandSelect, new { FornecedorID = id });
                 }
             }
             catch (SqlException e)
@@ -122,15 +122,15 @@ namespace TesteDapperRepository.Repository
             }
         }
 
-        public override IEnumerable<Produto> GetList()
+        public override IEnumerable<Fornecedor> GetList()
         {
             try
             {
                 using (var connection = new SqlConnection(connectionFactory.GetConnection.ConnectionString.ToString()))
                 {
-                    string commandSelect = "select * from dbo.wbyp_produto_dap";
+                    string commandSelect = "select * from dbo.wbyp_fornecedor_dap";
 
-                    return connection.Query<Produto>(commandSelect).ToList();
+                    return connection.Query<Fornecedor>(commandSelect).ToList();
                 }
             }
             catch (SqlException e)
@@ -139,33 +139,40 @@ namespace TesteDapperRepository.Repository
             }
         }
 
-        public IEnumerable<Produto> GetProdutoByFilter(int? FornecedorID, string Nome, DateTime? DataRegistro, DateTime? DataEsgotado)
+        public IEnumerable<Fornecedor> GetFornecedorByCidade(string Cidade)
         {
-            //TODO fazer a consulta por store procedure
-
-            var query = GetList();
-
-            if (FornecedorID.HasValue)
+            try
             {
-                query = query.Where(p => p.FornecedorID == FornecedorID); 
-            }
+                using (var connection = new SqlConnection(connectionFactory.GetConnection.ConnectionString.ToString()))
+                {
+                    string commandSelect = "select * from dbo.wbyp_fornecedor_dap " +
+                                           "where cidade = @Cidade";
 
-            if (!string.IsNullOrEmpty(Nome))
+                    return connection.Query<Fornecedor>(commandSelect, new { Cidade = Cidade }).ToList();
+                }
+            }
+            catch (SqlException e)
             {
-                query = query.Where(p => p.Nome.ToLower().Contains(Nome.ToLower()));
+                throw new Exception(e.Message.ToString());
             }
+        }
 
-            if (DataRegistro.HasValue)
+        public IEnumerable<Fornecedor> GetFornecedorByPais(string Pais)
+        {
+            try
             {
-                query = query.Where(p => p.DataRegistro == DataRegistro);
-            }
+                using (var connection = new SqlConnection(connectionFactory.GetConnection.ConnectionString.ToString()))
+                {
+                    string commandSelect = "select * from dbo.wbyp_fornecedor_dap " +
+                                           "where pais = @Pais";
 
-            if (DataEsgotado.HasValue)
+                    return connection.Query<Fornecedor>(commandSelect, new { Pais = Pais }).ToList();
+                }
+            }
+            catch (SqlException e)
             {
-                query = query.Where(p => p.DataEsgotado == DataEsgotado);
+                throw new Exception(e.Message.ToString());
             }
-
-            return query.ToList();
         }
     }
 }

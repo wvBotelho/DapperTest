@@ -49,17 +49,19 @@
     <Compile Include="Infraestrutura\ConnectionFactory.cs" />
     <Compile Include="Infraestrutura\IConnectionFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repository\FornecedorRepository.cs" />
     <Compile Include="Repository\GenericRepository.cs" />
+    <Compile Include="Repository\IFornecedorRepository.cs" />
     <Compile Include="Repository\IGenericRepository.cs" />
     <Compile Include="Repository\IProdutoReposity.cs" />
     <Compile Include="Repository\ProdutoRepository.cs" />
+    <Compile Include="Service\ProdutoService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Service\" />
     <Folder Include="UnitOfWork\" />
   </ItemGroup>
   <ItemGroup>

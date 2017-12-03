@@ -56,7 +56,7 @@ namespace UsandoDapper.Models.Mapping
                 .IsOptional();
 
             //Relacionamento
-            HasRequired(p => p.Fornecedor)
+            HasOptional(p => p.Fornecedor)
                 .WithMany(p => p.Produtos)
                 .HasForeignKey(p => p.FornecedorID)
                 .WillCascadeOnDelete(false);
