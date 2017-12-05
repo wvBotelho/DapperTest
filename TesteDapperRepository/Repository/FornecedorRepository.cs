@@ -35,9 +35,9 @@ namespace TesteDapperRepository.Repository
                 using (var connection = new SqlConnection(connectionFactory.GetConnection.ConnectionString.ToString()))
                 {
                     string commandInsert = "insert into dbo.wbyp_fornecedor_dap (nome, nome_contato, cargo, cidade, pais) " +
-                                           "values (@Nome, @NomeContato, @Cargo, @Cidade, @Pais)";
+                                           "values (@Nome, @Contato, @Cargo, @Cidade, @Pais)";
 
-                    connection.Execute(commandInsert, entity, null, 5000);
+                    connection.Execute(commandInsert, entity, null, 1000);
 
                     return true;
                 }
@@ -60,7 +60,8 @@ namespace TesteDapperRepository.Repository
                 using (var connection = new SqlConnection(connectionFactory.GetConnection.ConnectionString.ToString()))
                 {
                     string commandUpdate = "update dbo.wbyp_fornecedor_dap " +
-                                           "set nome = @Nome, nome_contato = @NomeContato, cargo = @Cargo"; 
+                                           "set nome = @Nome, nome_contato = @Contato, cargo = @Cargo, cidade = @Cidade, Pais = @Pais " +
+                                           "where id_fornecedor = @FornecedorID"; 
 
                     connection.Execute(commandUpdate, entity);
 

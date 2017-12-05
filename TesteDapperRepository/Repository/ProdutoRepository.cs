@@ -60,7 +60,7 @@ namespace TesteDapperRepository.Repository
                 using (var connection = new SqlConnection(connectionFactory.GetConnection.ConnectionString.ToString()))
                 {
                     string commandUpdate = "update dbo.wbyp_produto_dap " +
-                                           "set nome = @Nome, preco = @Preco, qtd_estoque = @QtEstoque, qtd_pedido = @QtPedido, data_registro = @DataRegistro, data_esgotado = @DataEsgotado " +
+                                           "set nome = @Nome, preco = @Preco, qtd_estoque = @QtEstoque, qtd_pedido = @QtPedido, data_registro = @DataRegistro, data_esgotado = @DataEsgotado, id_fornecedor = @FornecedorID " +
                                            "where id_produto = @ProdutoID";
 
                     connection.Execute(commandUpdate, entity);
@@ -166,6 +166,29 @@ namespace TesteDapperRepository.Repository
             }
 
             return query.ToList();
+        }
+
+        public IEnumerable<Produto> GetProdutoByFornecedor(int FornecedorID)
+        {
+            try
+            {
+                if (FornecedorID == 0)
+                {
+                    return null;
+                }
+
+                using (var connection = new SqlConnection(connectionFactory.GetConnection.ConnectionString.ToString()))
+                {
+                    string commandSelect = "select * from dbo.wbyp_produto_dap " +
+                                           "where id_fornecedor = @FornecedorID";
+
+                    return connection.Query<Produto>(commandSelect, new { FornecedorID = FornecedorID });
+                }
+            }
+            catch (SqlException e)
+            {
+                throw new Exception(e.Message.ToString());
+            }
         }
     }
 }

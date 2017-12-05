@@ -15,14 +15,16 @@ namespace UsandoDapper.UnitTest
         #region Helper
 
         private ProdutoRepository Service;
-        private EntityContext Context;
+        private EntityContext EntityService;
+        private FornecedorRepository FornecedorService;
         private Stopwatch stopwatch;
 
         [TestInitialize]
         public void Initialize()
         {
             Service = new ProdutoRepository();
-            Context = new EntityContext();
+            EntityService = new EntityContext();
+            FornecedorService = new FornecedorRepository();
             stopwatch = new Stopwatch();
         }
 
@@ -37,6 +39,68 @@ namespace UsandoDapper.UnitTest
                     QtEstoque = 5,
                     DataRegistro = DateTime.Today
                 };
+            }
+        }
+
+        private Fornecedor GetNewFornecedor
+        {
+            get
+            {
+                return new Fornecedor()
+                {
+                    Nome = "Big Boy Games",
+                    Contato = "Big Boy",
+                    Cargo = "CEO",
+                    Cidade = "São Paulo",
+                    Pais = "Brasil"                    
+                };
+            }
+        }
+
+        private List<Fornecedor> GetListNewFornecedores
+        {
+            get
+            {
+                List<Fornecedor> Fornecedores = new List<Fornecedor>()
+                {
+                    new Fornecedor()
+                    {
+                        Nome = "Games 4",
+                        Contato = "Ricardo Gonçalves",
+                        Cargo = "Vendedor",
+                        Cidade = "São Paulo",
+                        Pais = "Brasil"
+                    },
+
+                    new Fornecedor()
+                    {
+                        Nome = "Submarino",
+                        Contato = "Um cara rico",
+                        Cargo = "CEO",
+                        Cidade = "Rio de Janeiro",
+                        Pais = "Brasil"
+                    },
+
+                    new Fornecedor()
+                    {
+                        Nome = "Americanas.com",
+                        Contato = "Um americano",
+                        Cargo = "Vice-Presidente",
+                        Cidade = "New York City",
+                        Pais = "United States of America"
+                    },
+
+                    new Fornecedor()
+                    {
+                        Nome = "Aliexpress",
+                        Contato = "Um chinês",
+                        Cargo = "Dono da porra toda",
+                        Cidade = "Xangai",
+                        Pais = "China"
+                    }
+                };
+
+                return Fornecedores;
             }
         }
 
@@ -83,62 +147,47 @@ namespace UsandoDapper.UnitTest
             }
         }
 
+        private Produto GetLastProduto
+        {
+            get
+            {
+                Produto produto = Service.GetList().LastOrDefault();
+
+                if (produto == null)
+                {
+                    Assert.Fail("Produto não encontrado");
+                }
+
+                return produto;
+            }
+        }
+
+        private Fornecedor GetLastFornecedor
+        {
+            get
+            {
+                Fornecedor fornecedor = FornecedorService.GetList().LastOrDefault();
+                var tested = FornecedorService.GetList();
+
+                if (fornecedor == null)
+                {
+                    Assert.Fail("Fornecedor não encontrado");
+                }
+
+                return fornecedor;
+            }
+        }
+
         #endregion
+
+        #region Produto
 
         [TestMethod]
         public void Adicionar_Produto()
         {
             Assert.IsTrue(Service.Add(GetNewProduto));
 
-            Produto produto = Service.GetList().LastOrDefault();
-
-            Assert.AreEqual(GetNewProduto.Nome, produto.Nome);
-        }
-
-        [TestMethod]
-        public void Atualizar_Produto()
-        {
-            Produto produto = Service.GetList().LastOrDefault();
-            produto.Nome = "Ys VII - Lacrimosa of Dana";
-            produto.Preco = 189.99M;
-            produto.QtEstoque = 5;
-            produto.DataRegistro = DateTime.Now;
-
-            Assert.IsTrue(Service.Update(produto));
-        }
-
-        [TestMethod]
-        public void Deletar_Produto()
-        {
-            int produtoID = Service.GetList().FirstOrDefault().ProdutoID;
-
-            Assert.IsTrue(Service.Delete(produtoID));
-
-            Produto produto = Service.Find(produtoID);
-
-            Assert.IsNull(produto);
-        }
-
-        [TestMethod]
-        public void Consultar_Produto_Por_ID()
-        {
-            Assert.IsNotNull(Service.Find(3));
-        }
-
-        [TestMethod]
-        public void Consultar_Produto_Por_Filtro()
-        {
-            var query = Service.GetProdutoByFilter(null, string.Empty, DateTime.Today, null);
-
-            Assert.AreEqual(4, query.Count());
-        }
-
-        [TestMethod]
-        public void Consultar_Produto_Por_Nome()
-        {
-            var query = Service.GetProdutoByFilter(null, "final fantasy", DateTime.Today, null);
-
-            Assert.AreEqual(2, query.Count());
+            Assert.AreEqual(GetNewProduto.Nome, GetLastProduto.Nome);
         }
 
         [TestMethod]
@@ -151,11 +200,145 @@ namespace UsandoDapper.UnitTest
         }
 
         [TestMethod]
-        public void Adicionar_1000_Produtos()
+        public void Atualizar_Produto()
         {
-            for(int i = 0; i < 1000; i++)
+            Produto produto = GetLastProduto;
+            produto.Nome = "Ys VII - Lacrimosa of Dana";
+            produto.Preco = 189.99M;
+            produto.QtEstoque = 5;
+            produto.DataRegistro = DateTime.Now;
+
+            Assert.IsTrue(Service.Update(produto));
+        }
+
+        [TestMethod]
+        public void Deletar_Produto()
+        {
+            int id = GetLastProduto.ProdutoID;
+
+            Assert.IsTrue(Service.Delete(id));
+
+            Assert.IsNull(Service.Find(id));
+        }
+
+        [TestMethod]
+        public void Consultar_Produto_Por_ID()
+        {
+            Assert.IsNotNull(Service.Find(GetLastProduto.ProdutoID));
+        }
+
+        [TestMethod]
+        public void Consultar_Produto_Por_Filtro()
+        {
+            var query = Service.GetProdutoByFilter(null, string.Empty, DateTime.Today, null);
+
+            int valorEsperado = 4;
+
+            Assert.AreEqual(valorEsperado, query.Count());
+        }
+
+        [TestMethod]
+        public void Consultar_Produto_Por_Nome()
+        {
+            var query = Service.GetProdutoByFilter(null, "final fantasy", null, null);
+
+            int valorEsperado = 3;
+
+            Assert.AreEqual(valorEsperado, query.Count());
+        }
+
+        [TestMethod]
+        public void Consultar_Produto_Por_FornecedorID()
+        {
+            var query = Service.GetProdutoByFornecedor(GetLastFornecedor.FornecedorID);
+
+            int valorEsperado = 0;
+
+            Assert.AreEqual(valorEsperado, query.Count());
+        }
+
+        #endregion
+
+        #region Fornecedor
+
+        [TestMethod]
+        public void Adicionar_Fornecedor()
+        {
+            Assert.IsTrue(FornecedorService.Add(GetNewFornecedor));
+        }
+
+        [TestMethod]
+        public void Adicionar_Fornecedores()
+        {
+            foreach(Fornecedor fornecedor in GetListNewFornecedores)
             {
-                Assert.IsTrue(Service.Add(GetNewProduto));
+                Assert.IsTrue(FornecedorService.Add(fornecedor));
+            }
+        }
+
+        [TestMethod]
+        public void Atualizar_Fornecedor()
+        {
+            Fornecedor fornecedor = GetLastFornecedor;
+            fornecedor.Contato = "Jack Chan";
+            fornecedor.Cidade = "Pequin";
+            fornecedor.Pais = "Hong Kong";
+
+            Assert.IsTrue(FornecedorService.Update(fornecedor));
+        }
+
+        [TestMethod]
+        public void Deletar_Fornecedor()
+        {
+            int id = GetLastFornecedor.FornecedorID;
+
+            Assert.IsTrue(FornecedorService.Delete(id));
+
+            Assert.IsNull(FornecedorService.Find(id));
+        }
+
+        [TestMethod]
+        public void Consultar_Fornecedor_Por_Cidade()
+        {
+            var query = FornecedorService.GetFornecedorByCidade("São Paulo");
+
+            int valorEsperado = 2;
+
+            Assert.AreEqual(valorEsperado, query.Count());
+        }
+
+        [TestMethod]
+        public void Consultar_Fornecedor_Por_Pais()
+        {
+            var query = FornecedorService.GetFornecedorByPais("Brasil");
+
+            int valorEsperado = 3;
+
+            Assert.AreEqual(valorEsperado, query.Count());
+        }
+
+        [TestMethod]
+        public void Adicionar_Fornecedor_A_Produto()
+        {
+            foreach (Fornecedor fornecedor in FornecedorService.GetList())
+            {
+                foreach(Produto produto in Service.GetList())
+                {
+                    produto.FornecedorID = fornecedor.FornecedorID;
+                    Assert.IsTrue(Service.Update(produto));
+                }
+            }
+        } 
+
+        #endregion
+
+        [TestMethod]
+        public void Adicionar_Fornecedor_Produto()
+        {
+            var query = Service.GetList().Where(p => p.Nome.Contains("Final Fantasy"));
+
+            foreach(var produto in query)
+            {
             }
         }
 
@@ -177,7 +360,7 @@ namespace UsandoDapper.UnitTest
         {
             stopwatch.Start();
 
-            var query = Context.Produto;
+            var query = EntityService.Produto;
 
             stopwatch.Stop();
 
