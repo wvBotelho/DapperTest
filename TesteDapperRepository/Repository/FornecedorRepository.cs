@@ -162,5 +162,23 @@ namespace TesteDapperRepository.Repository
                 throw new Exception(e.Message.ToString());
             }
         }
+
+        public Fornecedor GetLastFornecedor()
+        {
+            try
+            {
+                using (IDbConnection connection = connectionFactory.GetConnection)
+                {
+                    string commandSelect = "select * from dbo.wbyp_fornecedor_dap " +
+                                           "where id_fornecedor = (select max(id_fornecedor) from dbo.wbyp_fornecedor_dap)";
+
+                    return connection.QueryFirstOrDefault<Fornecedor>(commandSelect);
+                }
+            }
+            catch (SqlException e)
+            {
+                throw new Exception(e.Message.ToString());
+            }
+        }
     }
 }

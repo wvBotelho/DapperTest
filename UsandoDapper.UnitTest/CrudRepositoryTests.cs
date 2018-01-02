@@ -151,7 +151,8 @@ namespace UsandoDapper.UnitTest
         {
             get
             {
-                Produto produto = Service.GetList().LastOrDefault();
+                //Produto produto = Service.GetList().LastOrDefault();
+                Produto produto = Service.GetLastProduto();
 
                 if (produto == null)
                 {
@@ -166,8 +167,8 @@ namespace UsandoDapper.UnitTest
         {
             get
             {
-                Fornecedor fornecedor = FornecedorService.GetList().LastOrDefault();
-                var tested = FornecedorService.GetList();
+                //Fornecedor fornecedor = FornecedorService.GetList().LastOrDefault();
+                Fornecedor fornecedor = FornecedorService.GetLastFornecedor();
 
                 if (fornecedor == null)
                 {

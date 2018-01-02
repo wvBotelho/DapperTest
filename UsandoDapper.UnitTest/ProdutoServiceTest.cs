@@ -37,7 +37,8 @@ namespace UsandoDapper.UnitTest
         {
             get
             {
-                Produto produto = Service.GetList().LastOrDefault();
+                //Produto produto = Service.GetList().LastOrDefault();
+                Produto produto = Service.GetLastProduto();
 
                 if (produto == null)
                 {

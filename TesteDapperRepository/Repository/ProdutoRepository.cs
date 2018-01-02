@@ -177,5 +177,23 @@ namespace TesteDapperRepository.Repository
                 throw new Exception(e.Message.ToString());
             }
         }
+
+        public Produto GetLastProduto()
+        {
+            try
+            {
+                using (IDbConnection connection = connectionFactory.GetConnection)
+                {
+                    string commandSelect = "select * from dbo.wbyp_produto_dap " +
+                                           "where id_produto = (select max(id_produto) from dbo.wbyp_produto_dap)";
+
+                    return connection.QueryFirstOrDefault<Produto>(commandSelect);
+                }
+            }
+            catch (SqlException e)
+            {
+                throw new Exception(e.Message.ToString());
+            }
+        }
     }
 }

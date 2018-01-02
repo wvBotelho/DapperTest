@@ -8,5 +8,7 @@ namespace TesteDapperRepository.Repository
         IEnumerable<Fornecedor> GetFornecedorByCidade(string Cidade);
 
         IEnumerable<Fornecedor> GetFornecedorByPais(string Pais);
+
+        Fornecedor GetLastFornecedor();
     }
 }
