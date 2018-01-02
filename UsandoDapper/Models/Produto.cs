@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace UsandoDapper.Models
 {
-    public class Produto
+    public class Produto : IValidatableObject
     {
         [Column("id_produto")]
         public int ProdutoID { get; set; }
@@ -31,5 +33,33 @@ namespace UsandoDapper.Models
 
         //Propriedade de navegação
         public Fornecedor Fornecedor { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (QtEstoque == 0)
+            {
+                yield return new ValidationResult("Quantidade de estoque não pode ser zero", new[] { "QtEstoque" });
+            }
+
+            if (QtEstoque < 0)
+            {
+                yield return new ValidationResult("Quantidade de estoque não pode ser negativa", new[] { "QtEstoque" });
+            }
+
+            if (string.IsNullOrEmpty(Nome))
+            {
+                yield return new ValidationResult("Nome obrigatório", new[] { "Nome" });
+            }
+
+            if (DataEsgotado < DataEsgotado)
+            {
+                yield return new ValidationResult("Data de esgotado não pode ser maior que data registro", new[] { "DataEsgotado" });
+            }
+
+            if (DataRegistro < DateTime.Today)
+            {
+                yield return new ValidationResult("Data de Registro não pode ser inferior ao dia atual", new[] { "DataEsgotado" });
+            }
+        }
     }
 }

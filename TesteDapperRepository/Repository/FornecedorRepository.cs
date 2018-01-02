@@ -1,28 +1,15 @@
 ﻿using Dapper;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using TesteDapperRepository.Infraestrutura;
 using UsandoDapper.Models;
 
 namespace TesteDapperRepository.Repository
 {
     public class FornecedorRepository : GenericRepository<Fornecedor>, IFornecedorRepository
     {
-        private IConnectionFactory connectionFactory;
-
-        public FornecedorRepository()
-        {
-            //conexão
-            connectionFactory = new ConnectionFactory();
-
-            //mapeando atributos do objeto com a tabela  
-            SqlMapper.SetTypeMap(typeof(Fornecedor), new CustomPropertyTypeMap(typeof(Fornecedor),
-                (type, columnName) => type.GetProperties().FirstOrDefault(prop => prop.GetCustomAttributes(false).OfType<ColumnAttribute>().Any(attr => attr.Name == columnName))));
-        }
-
         public override bool Add(Fornecedor entity)
         {
             try
@@ -32,7 +19,7 @@ namespace TesteDapperRepository.Repository
                     return false;
                 }
 
-                using (var connection = new SqlConnection(connectionFactory.GetConnection.ConnectionString.ToString()))
+                using (IDbConnection connection = connectionFactory.GetConnection)
                 {
                     string commandInsert = "insert into dbo.wbyp_fornecedor_dap (nome, nome_contato, cargo, cidade, pais) " +
                                            "values (@Nome, @Contato, @Cargo, @Cidade, @Pais)";
@@ -57,7 +44,7 @@ namespace TesteDapperRepository.Repository
                     return false;
                 }
 
-                using (var connection = new SqlConnection(connectionFactory.GetConnection.ConnectionString.ToString()))
+                using (IDbConnection connection = connectionFactory.GetConnection)
                 {
                     string commandUpdate = "update dbo.wbyp_fornecedor_dap " +
                                            "set nome = @Nome, nome_contato = @Contato, cargo = @Cargo, cidade = @Cidade, Pais = @Pais " +
@@ -84,7 +71,7 @@ namespace TesteDapperRepository.Repository
                     return false;
                 }
 
-                using (var connection = new SqlConnection(connectionFactory.GetConnection.ConnectionString.ToString()))
+                using (IDbConnection connection = connectionFactory.GetConnection)
                 {
                     string commandDelete = "delete from dbo.wbyp_fornecedor_dap " +
                                            "where id_fornecedor = @FornecedorID";
@@ -109,7 +96,7 @@ namespace TesteDapperRepository.Repository
                     return null;
                 }
 
-                using (var connection = new SqlConnection(connectionFactory.GetConnection.ConnectionString.ToString()))
+                using (IDbConnection connection = connectionFactory.GetConnection)
                 {
                     string commandSelect = "select * from dbo.wbyp_fornecedor_dap " +
                                            "where id_fornecedor = @FornecedorID";
@@ -127,7 +114,7 @@ namespace TesteDapperRepository.Repository
         {
             try
             {
-                using (var connection = new SqlConnection(connectionFactory.GetConnection.ConnectionString.ToString()))
+                using (IDbConnection connection = connectionFactory.GetConnection)
                 {
                     string commandSelect = "select * from dbo.wbyp_fornecedor_dap";
 
@@ -144,12 +131,12 @@ namespace TesteDapperRepository.Repository
         {
             try
             {
-                using (var connection = new SqlConnection(connectionFactory.GetConnection.ConnectionString.ToString()))
+                using (IDbConnection connection = connectionFactory.GetConnection)
                 {
                     string commandSelect = "select * from dbo.wbyp_fornecedor_dap " +
                                            "where cidade = @Cidade";
 
-                    return connection.Query<Fornecedor>(commandSelect, new { Cidade = Cidade }).ToList();
+                    return connection.Query<Fornecedor>(commandSelect, new { Cidade }).ToList();
                 }
             }
             catch (SqlException e)
@@ -162,12 +149,12 @@ namespace TesteDapperRepository.Repository
         {
             try
             {
-                using (var connection = new SqlConnection(connectionFactory.GetConnection.ConnectionString.ToString()))
+                using (IDbConnection connection = connectionFactory.GetConnection)
                 {
                     string commandSelect = "select * from dbo.wbyp_fornecedor_dap " +
                                            "where pais = @Pais";
 
-                    return connection.Query<Fornecedor>(commandSelect, new { Pais = Pais }).ToList();
+                    return connection.Query<Fornecedor>(commandSelect, new { Pais }).ToList();
                 }
             }
             catch (SqlException e)

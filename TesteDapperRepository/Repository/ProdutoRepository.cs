@@ -1,28 +1,15 @@
 ﻿using Dapper;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using TesteDapperRepository.Infraestrutura;
 using UsandoDapper.Models;
 
 namespace TesteDapperRepository.Repository
 {
     public class ProdutoRepository : GenericRepository<Produto>, IProdutoReposity
     {
-        private IConnectionFactory connectionFactory;
-
-        public ProdutoRepository()
-        {
-            //conexão
-            connectionFactory = new ConnectionFactory();
-
-            //mapeando atributos do objeto com a tabela  
-            SqlMapper.SetTypeMap(typeof(Produto), new CustomPropertyTypeMap(typeof(Produto),
-                (type, columnName) => type.GetProperties().FirstOrDefault(prop => prop.GetCustomAttributes(false).OfType<ColumnAttribute>().Any(attr => attr.Name == columnName))));
-        }
-
         public override bool Add(Produto entity)
         {
             try
@@ -32,7 +19,7 @@ namespace TesteDapperRepository.Repository
                     return false;
                 }
 
-                using (var connection = new SqlConnection(connectionFactory.GetConnection.ConnectionString.ToString()))
+                using (IDbConnection connection = connectionFactory.GetConnection)
                 {
                     string commandInsert = "insert into dbo.wbyp_produto_dap (nome, preco, qtd_estoque, qtd_pedido, data_registro, data_esgotado) " +
                                            "values (@Nome, @Preco, @QtEstoque, @QtPedido, @DataRegistro, @DataEsgotado)";
@@ -57,10 +44,10 @@ namespace TesteDapperRepository.Repository
                     return false;
                 }
 
-                using (var connection = new SqlConnection(connectionFactory.GetConnection.ConnectionString.ToString()))
+                using (IDbConnection connection = connectionFactory.GetConnection)
                 {
                     string commandUpdate = "update dbo.wbyp_produto_dap " +
-                                           "set nome = @Nome, preco = @Preco, qtd_estoque = @QtEstoque, qtd_pedido = @QtPedido, data_registro = @DataRegistro, data_esgotado = @DataEsgotado, id_fornecedor = @FornecedorID " +
+                                           "set nome = @Nome, preco = @Preco, qtd_estoque = @QtEstoque, qtd_pedido = @QtPedido, data_registro = @DataRegistro, data_esgotado = @DataEsgotado " +
                                            "where id_produto = @ProdutoID";
 
                     connection.Execute(commandUpdate, entity);
@@ -83,7 +70,7 @@ namespace TesteDapperRepository.Repository
                     return false;
                 }
 
-                using (var connection = new SqlConnection(connectionFactory.GetConnection.ConnectionString.ToString()))
+                using (IDbConnection connection = connectionFactory.GetConnection)
                 {
                     string commandDelete = "delete from dbo.wbyp_produto_dap " +
                                            "where id_produto = @ProdutoID";
@@ -108,7 +95,7 @@ namespace TesteDapperRepository.Repository
                     return null;
                 }
 
-                using (var connection = new SqlConnection(connectionFactory.GetConnection.ConnectionString.ToString()))
+                using (IDbConnection connection = connectionFactory.GetConnection)
                 {
                     string commandSelect = "select * from dbo.wbyp_produto_dap " +
                                            "where id_produto = @ProdutoID";
@@ -126,7 +113,7 @@ namespace TesteDapperRepository.Repository
         {
             try
             {
-                using (var connection = new SqlConnection(connectionFactory.GetConnection.ConnectionString.ToString()))
+                using (IDbConnection connection = connectionFactory.GetConnection)
                 {
                     string commandSelect = "select * from dbo.wbyp_produto_dap";
 
@@ -177,12 +164,12 @@ namespace TesteDapperRepository.Repository
                     return null;
                 }
 
-                using (var connection = new SqlConnection(connectionFactory.GetConnection.ConnectionString.ToString()))
+                using (IDbConnection connection = connectionFactory.GetConnection)
                 {
                     string commandSelect = "select * from dbo.wbyp_produto_dap " +
                                            "where id_fornecedor = @FornecedorID";
 
-                    return connection.Query<Produto>(commandSelect, new { FornecedorID = FornecedorID });
+                    return connection.Query<Produto>(commandSelect, new { FornecedorID });
                 }
             }
             catch (SqlException e)
